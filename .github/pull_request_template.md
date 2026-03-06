@@ -1,20 +1,32 @@
-## What does this PR do?
+## Summary
 
-<!-- Brief description -->
+<!-- What does this PR do? One sentence. -->
 
-## Type of change
+## Type
 
 - [ ] feat
 - [ ] fix
 - [ ] chore
 - [ ] refactor
+- [ ] test
+- [ ] docs
+- [ ] ci
 
-## How to test
+## Scope
 
-<!-- Steps to verify this works -->
+- [ ] server
+- [ ] client
+- [ ] shared
+- [ ] infra
 
 ## Checklist
 
-- [ ] Code compiles without errors
-- [ ] No console.logs left in
-- [ ] Relevant types updated
+- [ ] Follows `type(scope): description` commit convention
+- [ ] No secrets or .env values committed
+- [ ] No console.logs left in production code
+- [ ] Tests pass locally (`pnpm test`)
+- [ ] Types pass locally (`pnpm typecheck`)
+
+## Testing Notes
+
+<!-- How did you verify this works? -->
