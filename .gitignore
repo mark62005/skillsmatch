@@ -1,0 +1,52 @@
+# ── Environment variables ─────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.staging
+.env.production
+*.env
+
+# ── Node / pnpm ───────────────────────────────────────────────
+node_modules/
+.pnpm-store/
+npm-debug.log*
+pnpm-debug.log*
+
+# ── TypeScript build output ───────────────────────────────────
+dist/
+build/
+*.tsbuildinfo
+
+# ── Next.js ──────────────────────────────────────────────────
+client/.next/
+client/out/
+
+# ── Backend ───────────────────────────────────────────────────
+server/dist/
+server/build/
+
+# ── Prisma ───────────────────────────────────────────────────
+# Keep schema.prisma and migrations — exclude generated client
+server/node_modules/.prisma/
+server/src/generated/
+
+# ── Docker ───────────────────────────────────────────────────
+docker/volumes/
+
+# ── Testing ──────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ── IDE ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log

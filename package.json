@@ -1,0 +1,31 @@
+{
+	"name": "skillsmatch",
+	"version": "1.0.0",
+	"author": {
+		"name": "Mark Wong"
+	},
+	"private": true,
+	"description": "AI-powered fitness coaching for busy office professionals",
+	"packageManager": "pnpm@10.30.3+sha512.c961d1e0a2d8e354ecaa5166b822516668b7f44cb5bd95122d590dd81922f606f5473b6d23ec4a5be05e7fcd18e8488d47d978bbe981872f1145d06e9a740017",
+	"scripts": {
+		"dev:all": "pnpm --parallel --filter client --filter server dev",
+		"dev:client": "pnpm --filter client dev",
+		"dev:server": "pnpm --filter server dev",
+		"build": "pnpm --recursive build",
+		"lint": "pnpm --recursive lint",
+		"test": "pnpm --recursive test --run",
+		"db:migrate": "pnpm --filter server db:migrate",
+		"db:migrate:reset": "pnpm --filter server db:migrate:reset",
+		"db:studio": "pnpm --filter server db:studio",
+		"db:seed": "pnpm --filter server db:seed",
+		"db:generate": "pnpm --filter server db:generate",
+		"docker:up": "docker-compose up -d",
+		"docker:down": "docker-compose down",
+		"docker:reset": "docker-compose down -v",
+		"docker:logs": "docker-compose logs -f postgres"
+	},
+	"workspaces": [
+		"client",
+		"server"
+	]
+}
