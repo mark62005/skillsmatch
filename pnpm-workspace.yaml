@@ -1,4 +1,11 @@
 packages:
-  - "client"
-  - "server"
-  - "packages/*"
+  - client
+  - server
+  - packages/*
+
+onlyBuiltDependencies:
+  - "@clerk/shared"
+  - "@prisma/engines"
+  - esbuild
+  - prisma
+  - protobufjs
