@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Plan {
+  FREE
+  PRO
+}
+
+enum AnalysisStatus {
+  PENDING
+  PROCESSING
+  COMPLETE
+  FAILED
+}
+
+// ─────────────────────────────────────────────
+// MODELS
+// ─────────────────────────────────────────────
+
+model User {
+  id            String        @id @default(cuid())
+  clerkId       String        @unique
+  email         String        @unique
+  plan          Plan          @default(FREE)
+  analysisCount Int           @default(0)
+  analyses      Analysis[]
+  subscription  Subscription?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([clerkId])
+}
+
+model Analysis {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Raw inputs
+  resumeText     String @db.Text
+  jobDescription String @db.Text
+
+  // File upload metadata (null if user pasted text)
+  s3FileKey  String?
+  s3FileType String?
+
+  // AI outputs — stored as JSON for schema flexibility
+  parsedResume      Json?
+  parsedJD          Json?
+  matchResult       Json?
+  rewriteResult     Json?
+  prPathwayAnalysis Json?
+
+  // Denormalized for fast dashboard queries
+  nocCode    String?
+  nocTitle   String?
+  teerLevel  Int?
+  matchScore Float?
+
+  status       AnalysisStatus @default(PENDING)
+  errorMessage String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model Subscription {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  stripeCustomerId       String   @unique
+  stripeSubscriptionId   String   @unique
+  stripePriceId          String
+  stripeCurrentPeriodEnd DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
