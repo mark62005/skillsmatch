@@ -3,9 +3,9 @@ services:
     image: postgres:16-alpine
     container_name: skillsmatch_dev
     environment:
-      POSTGRES_USER: skillsmatch
-      POSTGRES_PASSWORD: skillsmatch
-      POSTGRES_DB: skillsmatch_dev
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_DEV}
     ports:
       - "5432:5432"
     volumes:
@@ -16,9 +16,9 @@ services:
     image: postgres:16-alpine
     container_name: skillsmatch_test
     environment:
-      POSTGRES_USER: skillsmatch
-      POSTGRES_PASSWORD: skillsmatch
-      POSTGRES_DB: skillsmatch_test
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB_TEST}
     ports:
       - "5433:5432"
     volumes:
