@@ -16,6 +16,14 @@ export const AppErrors = {
 		noToken: () =>
 			new AppError("No auth token provided.", 401, "NO_AUTH_TOKEN"),
 		noUserId: () => new AppError("No auth user ID.", 401, "NO_AUTH_USER_ID"),
+		missingSvixHeaders: () =>
+			new AppError("Missing svix headers.", 401, "MISSING_SVIX_HEADERS"),
+		invalidWebhookSignature: () =>
+			new AppError(
+				"Invalid webhook signature",
+				401,
+				"INVALID_WEBHOOK_SIGNATURE",
+			),
 	},
 	User: {
 		notFound: () => new AppError("User not found.", 404, "USER_NOT_FOUND"),

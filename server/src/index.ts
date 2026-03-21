@@ -12,6 +12,7 @@ import { generalLimiter } from "./middleware/rateLimit.middleware";
 import { inngestHandler } from "./inngest/serve";
 
 /* Import routes */
+import { webhooksRouter } from "./features/webhooks/webhooks.router";
 
 /* Validate Environment variables */
 
@@ -19,6 +20,7 @@ const requiredEnvVars = [
 	"DATABASE_URL",
 	"CLERK_SECRET_KEY",
 	"CLERK_PUBLISHABLE_KEY",
+	"CLERK_WEBHOOK_SECRET",
 ] as const;
 
 for (const envVar of requiredEnvVars) {
@@ -68,6 +70,9 @@ app.get("/health", (_req, res) => {
 	});
 });
 
+/* Ngrok */
+app.set("trust proxy", 1);
+
 /* Inngest Handler */
 app.use("/api/inngest", inngestHandler);
 
@@ -76,7 +81,7 @@ app.use("/api/inngest", inngestHandler);
 // Convention: all API routes live under /api/v1/ for versioning.
 // app.use("/api/v1/users", usersRouter);
 // app.use("/api/v1/analyses", analysesRouter);
-// app.use("/api/webhooks", webhooksRouter); // Note: no /v1 — webhooks are external contracts
+app.use("/api/webhooks", webhooksRouter); // Note: no /v1 — webhooks are external contracts
 
 /* 404 Handler */
 // Catches any request that didn't match a route above
