@@ -8,3 +8,6 @@ export {
 	selectIsAuthenticated,
 	selectAuthUser,
 } from "./authSlice";
+
+/* COMPONENTS */
+export { ClerkAuthTokenBridge } from "./components/ClerkAuthTokenBridge";
