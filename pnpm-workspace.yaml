@@ -4,8 +4,11 @@ packages:
   - packages/*
 
 onlyBuiltDependencies:
-  - "@clerk/shared"
-  - "@prisma/engines"
+  - '@clerk/shared'
+  - '@prisma/engines'
   - esbuild
+  - msw
   - prisma
   - protobufjs
+  - sharp
+  - unrs-resolver
