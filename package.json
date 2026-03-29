@@ -30,6 +30,7 @@
 	},
 	"workspaces": [
 		"client",
-		"server"
+		"server",
+		"packages/*"
 	]
 }
