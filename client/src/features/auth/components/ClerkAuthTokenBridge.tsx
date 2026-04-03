@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useAppDispatch } from "@/store/hooks";
 import { useGetMeQuery } from "@/features/users";
+import { useQueryWithRetry } from "../hooks/useQueryWithRetry";
 import { clearUser, setAuthUser, setIsLoading } from "../authSlice";
 
 export function ClerkAuthTokenBridge() {
@@ -11,11 +12,11 @@ export function ClerkAuthTokenBridge() {
 	const { isSignedIn, isLoaded } = useUser();
 
 	// Only fetch user data if Clerk user is signed in
-	const { data: backendUser, isLoading: isBackendLoading } = useGetMeQuery(
-		undefined,
-		{
+	const { data: backendUser, isLoading: isBackendLoading } = useQueryWithRetry(
+		useGetMeQuery(undefined, {
 			skip: !isLoaded || !isSignedIn,
-		},
+		}),
+		"USER_NOT_SYNCED",
 	);
 
 	useEffect(() => {
