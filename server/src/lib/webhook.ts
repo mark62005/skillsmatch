@@ -37,6 +37,8 @@ export type WebhookEvent =
 
 type ClerkUserData = {
 	id: string;
+	first_name: string;
+	last_name: string;
 	email_addresses: { email_address: string; id: string }[];
 	primary_email_address_id: string;
 };
