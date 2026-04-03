@@ -15,29 +15,34 @@ webhooksRouter.post(
 
 			switch (event.type) {
 				case "user.created": {
+					const clerkId = event.data.id;
+
 					const primaryEmail = event.data.email_addresses.find(
 						(e) => e.id === event.data.primary_email_address_id,
 					);
 
 					if (!primaryEmail) {
 						logger.warn("user.created event has no primary email", {
-							clerkId: event.data.id,
+							clerkId,
 						});
 						// Still return 200 — returning an error causes Clerk to retry
 						res.status(200).json({ received: true });
 						return;
 					}
 
-					await prisma.user.create({
-						data: {
-							clerkId: event.data.id,
+					await prisma.user.upsert({
+						where: { clerkId },
+						update: {},
+						create: {
+							clerkId,
+							name: `${event.data.first_name} ${event.data.last_name}`,
 							email: primaryEmail.email_address,
 							// plan defaults to FREE, analysisCount defaults to 0 per schema
 						},
 					});
 
 					logger.info("User created from Clerk webhook", {
-						clerkId: event.data.id,
+						clerkId,
 					});
 					break;
 				}
