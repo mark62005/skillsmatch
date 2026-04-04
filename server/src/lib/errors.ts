@@ -3,6 +3,7 @@ export class AppError extends Error {
 		public message: string,
 		public statusCode: number,
 		public code: string, // machine-readable, for frontend to act on
+		public data?: Record<string, unknown>,
 	) {
 		super(message);
 		this.name = "AppError";
@@ -33,8 +34,17 @@ export const AppErrors = {
 	Analysis: {
 		notFound: () =>
 			new AppError("Analysis not found.", 404, "ANALYSIS_NOT_FOUND"),
-		quotaExceeded: () =>
-			new AppError("Free analysis limit reached.", 403, "QUOTA_EXCEEDED"),
+		quotaExceeded: (data: {
+			analysesUsed: number;
+			analysesLimit: number;
+			plan: string;
+		}) =>
+			new AppError(
+				"Free analysis limit reached.",
+				403,
+				"QUOTA_EXCEEDED",
+				data, // travels with the error up to the middleware
+			),
 		forbidden: () =>
 			new AppError("You don't have access to this analysis.", 403, "FORBIDDEN"),
 	},
