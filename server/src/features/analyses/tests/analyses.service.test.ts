@@ -1,19 +1,21 @@
 import { FREE_ANALYSIS_LIMIT } from "../analyses.types";
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AppErrors } from "../../../lib/errors";
 
 /** MOCK PRISMA **/
+
+const mockTx = {
+	user: { update: vi.fn().mockResolvedValue({}) },
+	analysis: { create: vi.fn() },
+};
 
 vi.mock("../../../lib/prisma", () => ({
 	prisma: {
 		user: {
 			findUnique: vi.fn(),
 		},
-		analysis: {
-			create: vi.fn(),
-		},
-		$transaction: vi.fn(),
+		$transaction: vi.fn().mockImplementation(async (callback) => {
+			return callback(mockTx);
+		}),
 	},
 }));
 
@@ -74,6 +76,8 @@ describe("createAnalysis service", () => {
 	beforeEach(() => {
 		// Reset all mock state between tests.
 		vi.clearAllMocks();
+		mockTx.user.update.mockResolvedValue({});
+		mockTx.analysis.create.mockReset();
 	});
 
 	/* USER NOT FOUND */
@@ -150,7 +154,7 @@ describe("createAnalysis service", () => {
 			}) as any,
 		);
 
-		vi.mocked(prisma.analysis.create).mockResolvedValue({
+		mockTx.analysis.create.mockResolvedValue({
 			id: "analysis_boundary",
 			status: "PENDING",
 		} as any);
@@ -167,7 +171,7 @@ describe("createAnalysis service", () => {
 			buildUser({ plan: "PRO", analysisCount: 9999 }) as any,
 		);
 
-		vi.mocked(prisma.analysis.create).mockResolvedValue({
+		mockTx.analysis.create.mockResolvedValue({
 			id: "analysis_pro",
 			status: "PENDING",
 		} as any);
@@ -184,7 +188,7 @@ describe("createAnalysis service", () => {
 			buildUser({ plan: "FREE", analysisCount: 0 }) as any,
 		);
 
-		vi.mocked(prisma.analysis.create).mockResolvedValue({
+		mockTx.analysis.create.mockResolvedValue({
 			id: "analysis_happy",
 			status: "PENDING",
 		} as any);
@@ -204,7 +208,7 @@ describe("createAnalysis service", () => {
 			buildUser({ plan: "FREE", analysisCount: 0 }) as any,
 		);
 
-		vi.mocked(prisma.analysis.create).mockResolvedValue({
+		mockTx.analysis.create.mockResolvedValue({
 			id: "analysis_inngest_test",
 			status: "PENDING",
 		} as any);
@@ -227,9 +231,7 @@ describe("createAnalysis service", () => {
 		);
 
 		// Simulate a DB failure mid-operation
-		vi.mocked(prisma.analysis.create).mockRejectedValue(
-			new Error("DB connection lost"),
-		);
+		mockTx.analysis.create.mockRejectedValue(new Error("DB connection lost"));
 
 		await expect(createAnalysis(buildInput())).rejects.toThrow(
 			"DB connection lost",
@@ -239,7 +241,3 @@ describe("createAnalysis service", () => {
 		expect(inngest.send).not.toHaveBeenCalled();
 	});
 });
-
-/** MOCK PRISMA **/
-
-/** MOCK PRISMA **/
