@@ -40,14 +40,14 @@ import { createAnalysis } from "../analyses.service";
 
 function buildUser(
 	overrides: Partial<{
-		id: string;
+		userId: string;
 		plan: "FREE" | "PRO";
 		analysisCount: number;
 		name: string;
 	}> = {},
 ) {
 	return {
-		id: "user_test_123",
+		userId: "user_test_123",
 		plan: "FREE" as const,
 		analysisCount: 0,
 		name: "Test User",
@@ -57,13 +57,13 @@ function buildUser(
 
 function buildInput(
 	overrides: Partial<{
-		userId: string;
+		clerkId: string;
 		resumeText: string;
 		jobDescription: string;
 	}> = {},
 ) {
 	return {
-		userId: "user_test_123",
+		clerkId: "clerk_test_abc123",
 		resumeText: "A".repeat(100), // satisfies 50 char minimum from Zod schema
 		jobDescription: "B".repeat(100),
 		...overrides,
@@ -82,7 +82,7 @@ describe("createAnalysis service", () => {
 
 	/* USER NOT FOUND */
 
-	it("throws USER_NOT_FOUND when the user does not exist in the DB", async () => {
+	it("throws USER_NOT_FOUND when clerkId has no matching user in DB", async () => {
 		// Arrange: simulate the case where Clerk webhook hasn't synced yet
 		vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
