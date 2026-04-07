@@ -1,6 +1,8 @@
 import type { Analysis, User } from "../../generated/prisma";
 import { z } from "zod";
 
+/* CREATE ANALYSIS */
+
 /**
  * What the client sends when creating a new analysis.
  * TODO: Paste-only for now — no S3 file uploads yet.
@@ -23,7 +25,7 @@ export type TCreateAnalysisBody = z.infer<typeof createAnalysisBodySchema>;
  * The controller extracts these from req.user + validated req.body.
  */
 export interface ICreateAnalysisInput {
-	userId: string; // Internal DB id
+	clerkId: string;
 	resumeText: string;
 	jobDescription: string;
 }
@@ -56,3 +58,48 @@ export interface IQuotaExceededData {
 
 /** CONSTANTS **/
 export const FREE_ANALYSIS_LIMIT = 3;
+
+/* GET ANALYSES */
+
+export interface IGetAnalysesInput {
+	userId: string;
+}
+
+// Summary shape — no AI output JSON, just dashboard card data
+export interface IAnalysisSummary {
+	id: string;
+	status: Analysis["status"];
+	matchScore: number | null;
+	nocCode: string | null;
+	nocTitle: string | null;
+	teerLevel: number | null;
+	createdAt: Date;
+}
+
+export interface IGetAnalysesResult {
+	analyses: IAnalysisSummary[];
+}
+
+/* GET ANALYSIS BY ID */
+
+export interface IGetAnalysisByIdInput {
+	userId: string;
+	id: string;
+}
+
+// Full shape — includes all AI output JSON for the results page
+export interface IGetAnalysisByIdResult {
+	id: string;
+	status: Analysis["status"];
+	resumeText: string;
+	jobDescription: string;
+	matchScore: number | null;
+	nocCode: string | null;
+	nocTitle: string | null;
+	teerLevel: number | null;
+	parsedResume: unknown; // Stored as Json? in Prisma - validate the shape in the AI pipeline
+	parsedJD: unknown;
+	matchResult: unknown;
+	rewriteResult: unknown;
+	createdAt: Date;
+}
