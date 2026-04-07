@@ -3,6 +3,10 @@ import type {
 	ICreateAnalysisResult,
 	TQuotaCheckUser,
 	IQuotaExceededData,
+	IGetAnalysesInput,
+	IGetAnalysesResult,
+	IGetAnalysisByIdInput,
+	IGetAnalysisByIdResult,
 } from "./analyses.types";
 
 import { FREE_ANALYSIS_LIMIT } from "./analyses.types";
@@ -42,10 +46,12 @@ export function buildQuotaExceededData(
 
 /** SERVICE FUNCTIONS **/
 
+/* CREATE ANALYSIS */
+
 export async function createAnalysis(
 	input: ICreateAnalysisInput,
 ): Promise<ICreateAnalysisResult> {
-	const { userId, resumeText, jobDescription } = input;
+	const { clerkId, resumeText, jobDescription } = input;
 
 	/* Step 1: Fetch target user */
 	//
@@ -54,7 +60,7 @@ export async function createAnalysis(
 	// from the DB than the function actually uses. On a busy API this adds up.
 
 	const user = await prisma.user.findUnique({
-		where: { id: userId },
+		where: { clerkId },
 		select: {
 			id: true,
 			plan: true,
@@ -95,14 +101,14 @@ export async function createAnalysis(
 	const analysis = await prisma.$transaction(async (tx) => {
 		// Increment the user's analysis count
 		await tx.user.update({
-			where: { id: userId },
+			where: { id: user.id },
 			data: { analysisCount: { increment: 1 } },
 		});
 
 		// Create the analysis record with PENDING status
 		return tx.analysis.create({
 			data: {
-				userId,
+				userId: user.id,
 				resumeText,
 				jobDescription,
 				status: "PENDING",
@@ -137,3 +143,78 @@ export async function createAnalysis(
 		status: analysis.status,
 	};
 }
+
+/* GET ANALYSES */
+
+export async function getAnalyses(
+	input: IGetAnalysesInput,
+): Promise<IGetAnalysesResult> {
+	const { userId } = input;
+
+	const analyses = await prisma.analysis.findMany({
+		where: { userId },
+		select: {
+			id: true,
+			status: true,
+			matchScore: true,
+			nocCode: true,
+			nocTitle: true,
+			teerLevel: true,
+			createdAt: true,
+		},
+		orderBy: { createdAt: "desc" },
+	});
+
+	return { analyses };
+}
+
+/* GET ANALYSIS BY ID */
+
+export async function getAnalysisById(
+	input: IGetAnalysisByIdInput,
+): Promise<IGetAnalysisByIdResult> {
+	const { userId, id } = input;
+
+	const analysis = await prisma.analysis.findUnique({
+		where: { id },
+		select: {
+			id: true,
+			userId: true,
+			status: true,
+			resumeText: true,
+			jobDescription: true,
+			matchScore: true,
+			nocCode: true,
+			nocTitle: true,
+			teerLevel: true,
+			parsedResume: true,
+			parsedJD: true,
+			matchResult: true,
+			rewriteResult: true,
+			createdAt: true,
+		},
+	});
+
+	if (!analysis) {
+		throw AppErrors.Analysis.notFound();
+	}
+
+	// Check ownership after the DB query
+	// If we returned 404 for both "not found" and "not yours", an attacker
+	// can't tell whether the analysis exists at all.
+	// If we returned 403 for "not yours", we'd be leaking that the analysisId is valid.
+
+	if (analysis.userId !== userId) {
+		throw AppErrors.Analysis.forbidden();
+	}
+
+	return analysis;
+}
+
+/** SERVICE OBJECT **/
+
+export const analysesService = {
+	createAnalysis,
+	getAnalyses,
+	getAnalysisById,
+};
