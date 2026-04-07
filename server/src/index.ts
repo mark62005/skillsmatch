@@ -14,6 +14,7 @@ import { inngestHandler } from "./inngest/serve";
 /* Import routes */
 import { webhooksRouter } from "./features/webhooks/webhooks.router";
 import { usersRouter } from "./features/users/users.router";
+import { analysesRouter } from "./features/analyses/analyses.routes";
 
 /* Validate Environment variables */
 
@@ -81,7 +82,7 @@ app.use("/api/inngest", inngestHandler);
 // Routes are registered here as features are built.
 // Convention: all API routes live under /api/v1/ for versioning.
 app.use("/api/v1/users", usersRouter);
-// app.use("/api/v1/analyses", analysesRouter);
+app.use("/api/v1/analyses", analysesRouter);
 app.use("/api/webhooks", webhooksRouter); // Note: no /v1 — webhooks are external contracts
 
 /* 404 Handler */

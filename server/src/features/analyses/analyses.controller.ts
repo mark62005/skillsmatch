@@ -107,3 +107,9 @@ export async function getAnalysisByIdHandler(
 		next(err);
 	}
 }
+
+export const analysesController = {
+	createAnalysisHandler,
+	getAnalysesHandler,
+	getAnalysisByIdHandler,
+};
