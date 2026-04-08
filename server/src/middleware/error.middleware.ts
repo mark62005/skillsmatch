@@ -14,6 +14,7 @@ export function errorMiddleware(
 			statusCode: err.statusCode,
 			path: req.path,
 			method: req.method,
+			userId: req.user?.userId, // undefined on public routes
 		});
 
 		res.status(err.statusCode).json({
