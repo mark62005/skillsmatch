@@ -32,7 +32,7 @@ const TEST_RESUME_TEXT =
 const TEST_JOB_DESCRIPTION =
 	"Looking for a highly skilled and experienced senior engineer";
 
-async function seedUser() {
+async function seedUser(overrides = {}) {
 	return testPrisma.user.create({
 		data: {
 			clerkId: TEST_CLERK_ID,
@@ -40,6 +40,7 @@ async function seedUser() {
 			name: "Test User",
 			plan: "FREE",
 			analysisCount: 0,
+			...overrides,
 		},
 	});
 }
@@ -89,29 +90,11 @@ describe("POST /api/v1/analyses", () => {
 	});
 
 	it("returns 403 with QUOTA_EXCEEDED when user is at limit", async () => {
-		// Override analysisLimiter for this test only to simulate quota hit
-		const { analysisLimiter } = await import(
-			"../../../middleware/rateLimit.middleware"
-		);
-		vi.mocked(analysisLimiter).mockImplementationOnce(
-			(_req: any, res: any, _next: any) => {
-				res.status(403).json({
-					error: "Analysis limit reached",
-					code: "QUOTA_EXCEEDED",
-					data: {
-						analysesUsed: 3,
-						analysesLimit: 3,
-						plan: "FREE",
-					},
-				});
-			},
-		);
-
-		await seedUser();
+		await seedUser({ analysisCount: 3 });
 
 		const res = await request(app).post("/api/v1/analyses").send({
-			resumeText: "Software engineer with 5 years experience",
-			jobDescription: "Looking for a senior engineer",
+			resumeText: TEST_RESUME_TEXT,
+			jobDescription: TEST_JOB_DESCRIPTION,
 		});
 
 		expect(res.status).toBe(403);
