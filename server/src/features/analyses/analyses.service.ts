@@ -223,7 +223,7 @@ export async function getAnalysisById(
 	// If we returned 403 for "not yours", we'd be leaking that the analysisId is valid.
 
 	if (analysis.userId !== user.id) {
-		throw AppErrors.Analysis.forbidden();
+		throw AppErrors.Analysis.notFound();
 	}
 
 	return analysis;
