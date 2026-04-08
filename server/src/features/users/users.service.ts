@@ -29,3 +29,18 @@ export async function getMe(clerkId: string) {
 		analysesRemaining,
 	};
 }
+
+export async function resolveUser(clerkId: string) {
+	const user = await prisma.user.findUnique({
+		where: { clerkId },
+		select: {
+			id: true,
+			plan: true,
+			analysisCount: true,
+		},
+	});
+
+	if (!user) throw AppErrors.User.notSynced();
+
+	return user;
+}

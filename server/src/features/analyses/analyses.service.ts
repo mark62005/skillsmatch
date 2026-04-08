@@ -14,6 +14,7 @@ import { FREE_ANALYSIS_LIMIT } from "./analyses.types";
 import { prisma } from "../../lib/prisma";
 import { inngest } from "../../inngest/inngest.client";
 import { AppErrors } from "../../lib/errors";
+import { resolveUser } from "../users/users.service";
 
 /** PURE HELPER FUNCTIONS **/
 //
@@ -59,18 +60,7 @@ export async function createAnalysis(
 	// This is a performance habit worth building early: never fetch more data
 	// from the DB than the function actually uses. On a busy API this adds up.
 
-	const user = await prisma.user.findUnique({
-		where: { clerkId },
-		select: {
-			id: true,
-			plan: true,
-			analysisCount: true,
-		},
-	});
-
-	if (!user) {
-		throw AppErrors.User.notSynced();
-	}
+	const user = await resolveUser(clerkId);
 
 	/* Step 2: Enfore quota */
 	//
@@ -151,14 +141,7 @@ export async function getAnalyses(
 ): Promise<IGetAnalysesResult> {
 	const { clerkId } = input;
 
-	const user = await prisma.user.findUnique({
-		where: { clerkId },
-		select: { id: true },
-	});
-
-	if (!user) {
-		throw AppErrors.User.notSynced();
-	}
+	const user = await resolveUser(clerkId);
 
 	const analyses = await prisma.analysis.findMany({
 		where: { userId: user.id },
@@ -184,14 +167,7 @@ export async function getAnalysisById(
 ): Promise<IGetAnalysisByIdResult> {
 	const { clerkId, id } = input;
 
-	const user = await prisma.user.findUnique({
-		where: { clerkId },
-		select: { id: true },
-	});
-
-	if (!user) {
-		throw AppErrors.User.notSynced();
-	}
+	const user = await resolveUser(clerkId);
 
 	const analysis = await prisma.analysis.findUnique({
 		where: { id },
