@@ -82,13 +82,13 @@ describe("createAnalysis service", () => {
 
 	/* USER NOT FOUND */
 
-	it("throws USER_NOT_FOUND when clerkId has no matching user in DB", async () => {
+	it("throws USER_NOT_SYNCED when clerkId has no matching user in DB", async () => {
 		// Arrange: simulate the case where Clerk webhook hasn't synced yet
 		vi.mocked(prisma.user.findUnique).mockResolvedValue(null);
 
 		// Act + Assert
 		await expect(createAnalysis(buildInput())).rejects.toMatchObject({
-			code: "USER_NOT_FOUND",
+			code: "USER_NOT_SYNCED",
 			statusCode: 404,
 		});
 	});
