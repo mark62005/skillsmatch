@@ -70,9 +70,9 @@ export async function getAnalysesHandler(
 	next: NextFunction,
 ): Promise<void> {
 	try {
-		const userId = req.user!.userId;
+		const clerkId = req.user!.userId;
 
-		const result = await analysesService.getAnalyses({ userId });
+		const result = await analysesService.getAnalyses({ clerkId });
 
 		res.status(200).json({
 			success: true,
@@ -91,11 +91,11 @@ export async function getAnalysisByIdHandler(
 	next: NextFunction,
 ): Promise<void> {
 	try {
-		const userId = req.user!.userId;
+		const clerkId = req.user!.userId;
 		const idString = req.params.id as string;
 
 		const result = await analysesService.getAnalysisById({
-			userId,
+			clerkId,
 			id: idString,
 		});
 

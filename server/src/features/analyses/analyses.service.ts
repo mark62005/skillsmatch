@@ -69,7 +69,7 @@ export async function createAnalysis(
 	});
 
 	if (!user) {
-		throw AppErrors.User.notFound();
+		throw AppErrors.User.notSynced();
 	}
 
 	/* Step 2: Enfore quota */
@@ -149,10 +149,19 @@ export async function createAnalysis(
 export async function getAnalyses(
 	input: IGetAnalysesInput,
 ): Promise<IGetAnalysesResult> {
-	const { userId } = input;
+	const { clerkId } = input;
+
+	const user = await prisma.user.findUnique({
+		where: { clerkId },
+		select: { id: true },
+	});
+
+	if (!user) {
+		throw AppErrors.User.notSynced();
+	}
 
 	const analyses = await prisma.analysis.findMany({
-		where: { userId },
+		where: { userId: user.id },
 		select: {
 			id: true,
 			status: true,
@@ -173,7 +182,16 @@ export async function getAnalyses(
 export async function getAnalysisById(
 	input: IGetAnalysisByIdInput,
 ): Promise<IGetAnalysisByIdResult> {
-	const { userId, id } = input;
+	const { clerkId, id } = input;
+
+	const user = await prisma.user.findUnique({
+		where: { clerkId },
+		select: { id: true },
+	});
+
+	if (!user) {
+		throw AppErrors.User.notSynced();
+	}
 
 	const analysis = await prisma.analysis.findUnique({
 		where: { id },
@@ -204,7 +222,7 @@ export async function getAnalysisById(
 	// can't tell whether the analysis exists at all.
 	// If we returned 403 for "not yours", we'd be leaking that the analysisId is valid.
 
-	if (analysis.userId !== userId) {
+	if (analysis.userId !== user.id) {
 		throw AppErrors.Analysis.forbidden();
 	}
 

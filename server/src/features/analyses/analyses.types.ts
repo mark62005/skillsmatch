@@ -62,7 +62,7 @@ export const FREE_ANALYSIS_LIMIT = 3;
 /* GET ANALYSES */
 
 export interface IGetAnalysesInput {
-	userId: string;
+	clerkId: string;
 }
 
 // Summary shape — no AI output JSON, just dashboard card data
@@ -83,7 +83,7 @@ export interface IGetAnalysesResult {
 /* GET ANALYSIS BY ID */
 
 export interface IGetAnalysisByIdInput {
-	userId: string;
+	clerkId: string;
 	id: string;
 }
 
