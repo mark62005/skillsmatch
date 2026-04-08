@@ -10,7 +10,7 @@ import { inngestHandler } from "./inngest/serve";
 /* Import routes */
 import { webhooksRouter } from "./features/webhooks/webhooks.router";
 import { usersRouter } from "./features/users/users.router";
-import { analysesRouter } from "./features/analyses/analyses.routes";
+import { analysesRouter } from "./features/analyses";
 
 const app: Express = express();
 
