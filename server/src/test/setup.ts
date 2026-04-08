@@ -1,6 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { beforeAll, beforeEach, afterAll } from "vitest";
-import { execSync } from "child_process";
+import { beforeAll, beforeEach, afterAll, vi } from "vitest";
 import { resolve } from "path";
 import { PrismaClient } from "../generated/prisma";
 import { config } from "dotenv";
@@ -29,6 +28,23 @@ beforeEach(async () => {
 afterAll(async () => {
 	await testPrisma.$disconnect();
 });
+
+/* Mock Prisma */
+vi.mock("../lib/prisma", async () => {
+	const actual = await vi.importActual<any>("../lib/prisma");
+
+	return {
+		...actual,
+		prisma: testPrisma,
+	};
+});
+
+/* Mock Inngest */
+vi.mock("../inngest/inngest.client", () => ({
+	inngest: {
+		send: vi.fn().mockResolvedValue({ ids: ["test_event_id"] }),
+	},
+}));
 
 // Export so individual test files can use it to create test data
 export { testPrisma };
