@@ -14,11 +14,13 @@ export function errorMiddleware(
 			statusCode: err.statusCode,
 			path: req.path,
 			method: req.method,
+			userId: req.user?.userId, // undefined on public routes
 		});
 
 		res.status(err.statusCode).json({
 			error: err.message,
 			code: err.code, // consistent shape = frontend can switch on "code"
+			...(err.data && { data: err.data }),
 		});
 		return;
 	}
